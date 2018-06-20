@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "/home/charles/Documents/Personal Projects - Code/Flask - Python course/venv/bin/python3.6",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
+}
