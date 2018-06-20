@@ -27,19 +27,43 @@ class Item(Resource):
 
         return { 'message': 'Item not found' }, 404
 
+    @classmethod
+    def find_by_name(cls, name):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = 'SELECT * FROM items WHERE name=?'
+        result = cursor.execute(query, (name,))
+        row = result.fetchone()
+        if row:
+            item = cls(*row)
+        else:
+            item = None
+
+        connection.close()
+        return item
+
     def post(self, name):
-        if next(filter(lambda x: x['name'] == name, items), None) is not None:
+        if self.find_by_name(name):
             return {'message': "An item with name '{}' already exists".format(name)}, 400
 
         payload = Item.parser.parse_args()
 
         item = {'name': name, 'price': payload['price']}
-        items.append(item)
+        
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = 'INSERT INTO items VALUES (?, ?)'
+        cursor.execute(query, (item['name'], item['price']))
+
+        connection.commit()
+        connection.close()
+
         return item, 201
 
     def delete(self, name):
-        global items
-        items = list(filter(lambda x: x['name'] != name, items))
+        # items = list(filter(lambda x: x['name'] != name, items))
         return { 'message': 'Item deleted' }
 
     def put(self, name):
