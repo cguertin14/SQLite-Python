@@ -1,11 +1,16 @@
 import sqlite3
 from flask_restful import Resource, reqparse
+from flask_jwt import jwt_required, current_identity
 
-class User:
+class User(Resource):
     def __init__(self, _id, username, password):
         self.id = _id
         self.username = username
         self.password = password
+
+    @jwt_required()
+    def get(self):
+        user = current_identity
 
     @classmethod
     def find_by_username(cls, username):
